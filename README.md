@@ -62,8 +62,7 @@ Una plataforma de comercio electrónico diseñada para brindar una experiencia d
 
 ## Diagrama de Casos de Uso
 
-**[Aquí se incluiría un diagrama visual de casos de uso]**
-
+![Diagrama de Casos de Uso](images/diagrama_casos_uso.png)
 ---
 
 ## Referencias Bibliográficas
