@@ -21,6 +21,7 @@ CREATE TABLE Productos (
     stock INT DEFAULT 0,
     categoria_id INT NOT NULL,
     subcategoria_id INT,
+    links TEXT,
     FOREIGN KEY (categoria_id) REFERENCES Categoria(categoria_id) ON DELETE CASCADE,
     FOREIGN KEY (subcategoria_id) REFERENCES Subcategoria(subcategoria_id) ON DELETE SET NULL
 );
@@ -49,3 +50,48 @@ CREATE TABLE Clientes (
     tipo_cliente VARCHAR(50) NOT NULL CHECK (tipo_cliente IN ('guest', 'registrado')),
     keycloak_id UUID UNIQUE
 );
+
+-- Insertar datos en Categoria
+INSERT INTO Categoria (nombre) VALUES
+('Alimentos'),
+('Bebidas'),
+('Higiene'),
+('Lácteos');
+
+-- Insertar datos en Subcategoria
+INSERT INTO Subcategoria (nombre, categoria_id) VALUES
+('Galletas', 1),
+('Snacks', 1),
+('Jugos', 2),
+('Cervezas', 2),
+('Jabones', 3),
+('Shampoo', 3),
+('Leche', 4),
+('Quesos', 4);
+
+-- Insertar datos en Productos
+INSERT INTO Productos (nombre, descripcion, precio, stock, categoria_id, subcategoria_id, links) VALUES
+('Oreo', 'Galletas rellenas de crema', 1.50, 100, 1, 1, 'https://example.com/oreo'),
+('Pringles', 'Papas fritas en tubo', 3.00, 50, 1, 2, 'https://example.com/pringles'),
+('Coca-Cola', 'Bebida gaseosa clásica', 1.00, 200, 2, 3, 'https://example.com/coca-cola'),
+('Corona', 'Cerveza ligera mexicana', 1.75, 150, 2, 4, 'https://example.com/corona');
+
+-- Insertar datos en Bodega
+INSERT INTO Bodega (ubicacion) VALUES
+('Central'),
+('Norte'),
+('Sur');
+
+-- Insertar datos en Stock
+INSERT INTO Stock (producto_id, bodega_id, cantidad) VALUES
+(1, 1, 50),
+(1, 2, 50),
+(2, 1, 30),
+(3, 3, 100),
+(4, 3, 50);
+
+-- Insertar datos en Clientes
+INSERT INTO Clientes (nombre, email, tipo_cliente, keycloak_id) VALUES
+('Juan Pérez', 'juan.perez@example.com', 'registrado', '123e4567-e89b-12d3-a456-426614174000'),
+('María Gómez', 'maria.gomez@example.com', 'guest', NULL),
+('Carlos Díaz', 'carlos.diaz@example.com', 'registrado', '123e4567-e89b-12d3-a456-426614174001');

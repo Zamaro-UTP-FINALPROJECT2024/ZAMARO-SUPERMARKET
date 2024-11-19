@@ -1,5 +1,20 @@
-FROM node:16-alpine
+# Usa la imagen oficial de Node.js
+FROM node:16
+
+# Establece el directorio de trabajo
 WORKDIR /app
-COPY . .
+
+# Copia los archivos necesarios
+COPY package*.json ./
+
+# Instala las dependencias
 RUN npm install
+
+# Copia el resto del código
+COPY . .
+
+# Expone el puerto
+EXPOSE 3000
+
+# Comando por defecto para iniciar el servidor
 CMD ["npm", "start"]

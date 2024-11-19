@@ -1,45 +1,124 @@
-from flask import Flask
-"""from flask_graphql import GraphQLView
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from schema import schema
-from models import Base
-"""
+import os
+from flask import Flask, jsonify,request
+from flask_cors import CORS
+from models import db, Categoria, Subcategoria, Productos, Bodega, Stock, Clientes  # Importar la instancia de db y los modelos
+from sqlalchemy.pool import QueuePool
+
 app = Flask(__name__)
+CORS(app)
 
-# Configura la base de datos PostgreSQL
-DATABASE_URL = 'postgresql://username:password@localhost:5432/supermarket'
-"""try:
-    engine = create_engine(DATABASE_URL, echo=True)  # `echo=True` para debug
-    Session = sessionmaker(bind=engine)
-    db_session = scoped_session(Session)
-    Base.metadata.bind = engine
-    db_session = scoped_session(sessionmaker(bind=engine))
-    # Configura la ruta de GraphQL
-    app.add_url_rule(
-        '/graphql',
-        view_func=GraphQLView.as_view(
-            'graphql',
-            schema=schema,
-            graphiql=True  # Habilita la interfaz gráfica para pruebas
-        )
+# Configuración de la base de datos
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:password@db:5432/supermarket'
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'poolclass': QueuePool,
+    'pool_pre_ping': True,  # Habilita verificación de conexión
+}
+
+# Inicializar la base de datos con la aplicación
+db.init_app(app)
+
+# Rutas para Categorías
+@app.route('/categorias', methods=['GET'])
+def get_categorias():
+    categorias = Categoria.query.all()
+    return jsonify([{'categoria_id': c.categoria_id, 'nombre': c.nombre} for c in categorias])
+
+@app.route('/categorias', methods=['POST'])
+def add_categoria():
+    data = request.json
+    nueva_categoria = Categoria(nombre=data['nombre'])
+    db.session.add(nueva_categoria)
+    db.session.commit()
+    return jsonify({'message': 'Categoría creada exitosamente'}), 201
+
+# Rutas para Subcategorías
+@app.route('/subcategorias', methods=['GET'])
+def get_subcategorias():
+    subcategorias = Subcategoria.query.all()
+    return jsonify([{'subcategoria_id': s.subcategoria_id, 'nombre': s.nombre, 'categoria_id': s.categoria_id} for s in subcategorias])
+
+@app.route('/subcategorias', methods=['POST'])
+def add_subcategoria():
+    data = request.json
+    nueva_subcategoria = Subcategoria(nombre=data['nombre'], categoria_id=data['categoria_id'])
+    db.session.add(nueva_subcategoria)
+    db.session.commit()
+    return jsonify({'message': 'Subcategoría creada exitosamente'}), 201
+
+# Rutas para Productos
+@app.route('/productos', methods=['GET'])
+def get_productos():
+    productos = Productos.query.all()
+    return jsonify([{
+        'producto_id': p.producto_id,
+        'nombre': p.nombre,
+        'descripcion': p.descripcion,
+        'precio': float(p.precio),
+        'stock': p.stock,
+        'categoria_id': p.categoria_id,
+        'subcategoria_id': p.subcategoria_id
+    } for p in productos])
+
+@app.route('/productos', methods=['POST'])
+def add_producto():
+    data = request.json
+    nuevo_producto = Productos(
+        nombre=data['nombre'],
+        descripcion=data.get('descripcion'),
+        precio=data['precio'],
+        stock=data.get('stock', 0),
+        categoria_id=data['categoria_id'],
+        subcategoria_id=data.get('subcategoria_id')
     )
-    print("Conexión exitosa a la base de datos.")
-except Exception as e:
-    print("Error al conectar con la base de datos:", e)
-    raise"""
+    db.session.add(nuevo_producto)
+    db.session.commit()
+    return jsonify({'message': 'Producto creado exitosamente'}), 201
 
+# Rutas para Bodegas
+@app.route('/bodegas', methods=['GET'])
+def get_bodegas():
+    bodegas = Bodega.query.all()
+    return jsonify([{'bodega_id': b.bodega_id, 'ubicacion': b.ubicacion} for b in bodegas])
 
-# Ruta de Health Check
-@app.route('/', methods=['GET'])
-def health_check():
-    return {"status": "La API está funcionando correctamente."}, 200
+@app.route('/bodegas', methods=['POST'])
+def add_bodega():
+    data = request.json
+    nueva_bodega = Bodega(ubicacion=data['ubicacion'])
+    db.session.add(nueva_bodega)
+    db.session.commit()
+    return jsonify({'message': 'Bodega creada exitosamente'}), 201
 
-# Limpia la sesión después de cada solicitud
-#@app.teardown_appcontext
-#def shutdown_session(exception=None):
-#    db_session.remove()
+# Rutas para Clientes
+@app.route('/clientes', methods=['GET'])
+def get_clientes():
+    clientes = Clientes.query.all()
+    return jsonify([{
+        'cliente_id': c.cliente_id,
+        'nombre': c.nombre,
+        'email': c.email,
+        'tipo_cliente': c.tipo_cliente,
+        'keycloak_id': c.keycloak_id
+    } for c in clientes])
+
+@app.route('/clientes', methods=['POST'])
+def add_cliente():
+    data = request.json
+    nuevo_cliente = Clientes(
+        nombre=data.get('nombre'),
+        email=data.get('email'),
+        tipo_cliente=data['tipo_cliente'],
+        keycloak_id=data.get('keycloak_id')
+    )
+    db.session.add(nuevo_cliente)
+    db.session.commit()
+    return jsonify({'message': 'Cliente creado exitosamente'}), 201
+
+@app.route('/')
+def hello_world():
+    return 'Metelemente no saldras'
 
 if __name__ == '__main__':
-    print("Iniciando la aplicación... La API está funcionando en http://127.0.0.1:5000/health")
-    app.run(debug=True)
+    # Crear tablas si no existen
+    with app.app_context():
+        db.create_all()
+    app.run(host='0.0.0.0', port=5000, debug=True)
