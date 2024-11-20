@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useCarrito } from "../context/CarritoContext";
 
-const API_URL = "http://localhost:5000"; // Cambia si usas otro host o puerto
+const API_URL = "http://localhost:5000";
 
 function Productos() {
   const [productos, setProductos] = useState([]);
-  const [carrito, setCarrito] = useState([]);
+  const { agregarAlCarrito } = useCarrito();
 
   useEffect(() => {
     axios.get(`${API_URL}/productos`).then((response) => {
       setProductos(response.data);
     });
   }, []);
-
-  const agregarAlCarrito = (producto) => {
-    setCarrito([...carrito, producto]);
-    alert(`${producto.nombre} añadido al carrito.`);
-  };
 
   return (
     <div>

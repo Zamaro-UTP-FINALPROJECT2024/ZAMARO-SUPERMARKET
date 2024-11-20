@@ -51,6 +51,27 @@ CREATE TABLE Clientes (
     keycloak_id UUID UNIQUE
 );
 
+-- Tabla de Órdenes
+CREATE TABLE Ordenes (
+    orden_id SERIAL PRIMARY KEY,
+    cliente_id INT, -- Relación con la tabla Clientes (si hay un cliente registrado)
+    total DECIMAL(10, 2) NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cliente_id) REFERENCES Clientes(cliente_id) ON DELETE SET NULL
+);
+
+-- Tabla Detalle de Órdenes
+CREATE TABLE DetalleOrdenes (
+    detalle_id SERIAL PRIMARY KEY,
+    orden_id INT NOT NULL,
+    producto_id INT NOT NULL,
+    cantidad INT NOT NULL,
+    subtotal DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (orden_id) REFERENCES Ordenes(orden_id) ON DELETE CASCADE,
+    FOREIGN KEY (producto_id) REFERENCES Productos(producto_id) ON DELETE CASCADE
+);
+
+
 -- Insertar datos en Categoria
 INSERT INTO Categoria (nombre) VALUES
 ('Alimentos'),

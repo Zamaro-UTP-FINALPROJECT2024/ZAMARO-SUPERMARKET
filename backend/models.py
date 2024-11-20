@@ -45,3 +45,18 @@ class Clientes(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=True)
     tipo_cliente = db.Column(db.String(50), nullable=False)
     keycloak_id = db.Column(db.String(36), unique=True, nullable=True)
+
+class Orden(db.Model):
+    __tablename__ = 'ordenes'
+    orden_id = db.Column(db.Integer, primary_key=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.cliente_id'), nullable=True)
+    total = db.Column(db.Numeric(10, 2), nullable=False)
+    fecha = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+
+class DetalleOrden(db.Model):
+    __tablename__ = 'detalle_ordenes'
+    detalle_id = db.Column(db.Integer, primary_key=True)
+    orden_id = db.Column(db.Integer, db.ForeignKey('ordenes.orden_id', ondelete="CASCADE"), nullable=False)
+    producto_id = db.Column(db.Integer, db.ForeignKey('productos.producto_id', ondelete="CASCADE"), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    subtotal = db.Column(db.Numeric(10, 2), nullable=False)

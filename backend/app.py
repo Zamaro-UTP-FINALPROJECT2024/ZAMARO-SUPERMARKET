@@ -1,7 +1,7 @@
 import os
 from flask import Flask, jsonify,request
 from flask_cors import CORS
-from models import db, Categoria, Subcategoria, Productos, Bodega, Stock, Clientes  # Importar la instancia de db y los modelos
+from models import db, Categoria, Subcategoria, Productos, Bodega, Stock, Clientes , Orden, DetalleOrden # Importar la instancia de db y los modelos
 from sqlalchemy.pool import QueuePool
 
 app = Flask(__name__)
@@ -112,6 +112,37 @@ def add_cliente():
     db.session.add(nuevo_cliente)
     db.session.commit()
     return jsonify({'message': 'Cliente creado exitosamente'}), 201
+
+@app.route('/ordenes', methods=['POST'])
+def crear_orden():
+    try:
+        data = request.json
+        cliente_id = data.get('cliente_id')  # Opcional
+        carrito = data['carrito']  # Lista de productos con cantidad y subtotal
+
+        # Calcular el total de la orden
+        total = sum(item['subtotal'] for item in carrito)
+
+        # Crear la orden
+        nueva_orden = Orden(cliente_id=cliente_id, total=total)
+        db.session.add(nueva_orden)
+        db.session.flush()  # Obtener el ID de la nueva orden
+
+        # Agregar los detalles de la orden
+        for item in carrito:
+            detalle = DetalleOrden(
+                orden_id=nueva_orden.orden_id,
+                producto_id=item['producto_id'],
+                cantidad=item['cantidad'],
+                subtotal=item['subtotal']
+            )
+            db.session.add(detalle)
+
+        db.session.commit()
+        return jsonify({'message': 'Orden creada exitosamente', 'orden_id': nueva_orden.orden_id}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
 
 @app.route('/')
 def hello_world():
