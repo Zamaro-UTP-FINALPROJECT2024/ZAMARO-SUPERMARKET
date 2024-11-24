@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instala las dependencias
-RUN npm install axios react-router-dom
+RUN npm install axios react-router-dom @mui/material @emotion/react @emotion/styled react-slick slick-carousel --save @types/react-slick
+
 
 # Copia el resto del código
 COPY . .

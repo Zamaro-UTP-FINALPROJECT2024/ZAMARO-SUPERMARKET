@@ -1,55 +1,77 @@
 import React from "react";
+import { Container, Grid, Typography, Box, Button } from "@mui/material";
 import { useCarrito } from "../context/CarritoContext";
-import axios from "axios";
-
-const API_URL = "http://localhost:5000";
 
 function Carrito() {
   const { carrito, eliminarDelCarrito } = useCarrito();
 
-  const enviarOrden = async () => {
-    if (carrito.length === 0) {
-      alert("El carrito está vacío.");
-      return;
-    }
-
-    const data = {
-      cliente_id: null, // Cambia esto si tienes autenticación
-      carrito: carrito.map((producto) => ({
-        producto_id: producto.producto_id,
-        cantidad: 1, // O ajusta según tu lógica
-        subtotal: producto.precio,
-      })),
-    };
-
-    try {
-      const response = await axios.post(`${API_URL}/ordenes`, data);
-      alert(`Orden enviada exitosamente. ID de la orden: ${response.data.orden_id}`);
-    } catch (error) {
-      alert(`Error al enviar la orden: ${error.response?.data?.error || error.message}`);
-    }
-  };
+  // Calcular el total del carrito
+  const total = carrito.reduce((acc, producto) => acc + producto.precio, 0);
 
   return (
-    <div>
-      <h1>Carrito de Compras</h1>
+    <Container sx={{ py: 4 }}>
+      {/* Título */}
+      <Typography variant="h4" component="h1" textAlign="center" gutterBottom>
+        Tu Carrito de Compras
+      </Typography>
+
+      {/* Si el carrito está vacío */}
       {carrito.length === 0 ? (
-        <p>No hay productos en el carrito.</p>
+        <Typography variant="h6" textAlign="center" color="textSecondary">
+          No tienes productos en el carrito.
+        </Typography>
       ) : (
-        <ul>
-          {carrito.map((producto) => (
-            <li key={producto.producto_id}>
-              <h3>{producto.nombre}</h3>
-              <p>Precio: ${producto.precio}</p>
-              <button onClick={() => eliminarDelCarrito(producto.producto_id)}>Eliminar</button>
-            </li>
-          ))}
-        </ul>
+        <>
+          {/* Lista de productos en el carrito */}
+          <Grid container spacing={3}>
+            {carrito.map((producto) => (
+              <Grid item xs={12} sm={6} md={4} key={producto.producto_id}>
+                <Box
+                  sx={{
+                    border: "1px solid #ccc",
+                    borderRadius: "8px",
+                    padding: "16px",
+                    textAlign: "center",
+                  }}
+                >
+                  <Typography variant="h6">{producto.nombre}</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {producto.descripcion}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    color="primary"
+                    sx={{ mt: 2, mb: 2 }}
+                  >
+                    Precio: ${producto.precio}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => eliminarDelCarrito(producto.producto_id)}
+                  >
+                    Eliminar
+                  </Button>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* Total y Botón de Confirmar Compra */}
+          <Box sx={{ textAlign: "center", mt: 4 }}>
+            <Typography variant="h5">Total: ${total.toFixed(2)}</Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mt: 2 }}
+              onClick={() => alert("Orden enviada con éxito.")}
+            >
+              Confirmar Compra
+            </Button>
+          </Box>
+        </>
       )}
-      <button onClick={enviarOrden} disabled={carrito.length === 0}>
-        Enviar Orden
-      </button>
-    </div>
+    </Container>
   );
 }
 

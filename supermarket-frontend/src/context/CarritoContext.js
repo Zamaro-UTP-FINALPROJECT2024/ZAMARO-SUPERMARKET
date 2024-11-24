@@ -1,12 +1,9 @@
 import React, { createContext, useContext, useState } from "react";
 
-// Crear el contexto
 const CarritoContext = createContext();
 
-// Hook para usar el contexto
 export const useCarrito = () => useContext(CarritoContext);
 
-// Proveedor del contexto
 export const CarritoProvider = ({ children }) => {
   const [carrito, setCarrito] = useState([]);
 
