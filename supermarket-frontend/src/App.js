@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Productos from "./pages/Productos";
 import Carrito from "./pages/Carrito";
+import GestionarProductos from "./pages/GestionarProductos"; 
 // En App.js o index.css
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/productos" element={<Productos />} />
         <Route path="/carrito" element={<Carrito />} />
+        <Route path="/bodega" element={<GestionarProductos />} />  {/* Nueva ruta */}
       </Routes>
       <Footer />
     </CarritoProvider>
