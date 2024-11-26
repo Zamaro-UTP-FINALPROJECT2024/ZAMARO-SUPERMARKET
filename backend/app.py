@@ -74,6 +74,33 @@ def add_producto():
     db.session.commit()
     return jsonify({'message': 'Producto creado exitosamente'}), 201
 
+@app.route('/productos/<int:producto_id>', methods=['DELETE'])
+def delete_producto(producto_id):
+    producto = Productos.query.get(producto_id)
+    if producto:
+        db.session.delete(producto)
+        db.session.commit()
+        return jsonify({'message': 'Producto eliminado exitosamente'}), 200
+    else:
+        return jsonify({'error': 'Producto no encontrado'}), 404
+
+@app.route('/productos/<int:producto_id>', methods=['PUT'])
+def update_producto(producto_id):
+    producto = Productos.query.get(producto_id)
+    if not producto:
+        return jsonify({'error': 'Producto no encontrado'}), 404
+
+    data = request.json
+    producto.nombre = data.get('nombre', producto.nombre)
+    producto.precio = data.get('precio', producto.precio)
+    producto.descripcion = data.get('descripcion', producto.descripcion)
+    producto.stock = data.get('stock', producto.stock)
+    producto.categoria_id = data.get('categoria_id', producto.categoria_id)
+    producto.subcategoria_id = data.get('subcategoria_id', producto.subcategoria_id)
+
+    db.session.commit()
+    return jsonify({'message': 'Producto actualizado exitosamente'}), 200
+
 # Rutas para Bodegas
 @app.route('/bodegas', methods=['GET'])
 def get_bodegas():
