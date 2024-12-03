@@ -65,8 +65,87 @@ Una plataforma de comercio electrónico diseñada para brindar una experiencia d
 ![Diagrama de Casos de Uso](images/diagrama_casos_uso.png)
 ---
 
+# Instalación de Docker y Docker Compose
+
+### En sistemas Linux (Ubuntu/Debian):
+
+```bash
+# Actualizar paquetes existentes
+sudo apt-get update
+
+# Instalar paquetes necesarios para usar repositorios HTTPS
+sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+
+# Añadir la clave GPG oficial de Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Añadir el repositorio de Docker
+echo \"deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Actualizar los índices de paquetes e instalar Docker
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# Verificar instalación
+sudo docker --version
+
+# Instalar Docker Compose
+sudo curl -L \"https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose
+
+# Dar permisos de ejecución al binario
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Verificar instalación de Docker Compose
+docker-compose --version
+```
+
+### En sistemas macOS:
+
+```bash
+# Instalar Docker Desktop desde Homebrew
+brew install --cask docker
+
+# Abrir Docker Desktop manualmente para que se inicialice
+open /Applications/Docker.app
+
+# Verificar instalación
+docker --version
+docker-compose --version
+```
+
+### En sistemas Windows:
+
+```bash
+# Descargar e instalar Docker Desktop
+# 1. Ir a https://www.docker.com/products/docker-desktop/
+# 2. Descargar el instalador para Windows.
+# 3. Ejecutar el instalador y seguir las instrucciones en pantalla.
+
+# Configuración post-instalación
+# Asegúrate de que WSL2 esté habilitado si usas Windows 10/11 (necesario para Docker).
+
+# Verificar instalación
+powershell
+docker --version
+docker-compose --version
+```
+
+### Nota final:
+Para que Docker funcione correctamente sin `sudo` en Linux, añade tu usuario al grupo `docker`:
+
+```bash
+sudo usermod -aG docker $USER
+# Reinicia la sesión o ejecuta el siguiente comando para aplicar los cambios inmediatamente:
+newgrp docker
+
+
 ## Referencias Bibliográficas
 
 1. C. F. Bowman, L. Hernández, and S. Gerardotr, *Algoritmos y estructuras de datos: aproximación en C.*, 1999.
 2. M. Ahmad and Y. Zhang, *Enhanced Graph Algorithms Using Hybrid Data Structures,* IEEE International Conference on Big Data, 2023.
 3. C. Rodriguez, A. Lin, and M. Thomas, *A Novel Community Detection Algorithm for Sparse Data Networks,* IEEE Transactions on Knowledge and Data Engineering, vol. 35, no. 5, pp. 876-888, 2023.
+
